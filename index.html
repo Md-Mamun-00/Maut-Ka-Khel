@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>The Angry Hero - 90s Action</title>
+    <title>Maut Ka Khel - 90s Action</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bungee+Spice&family=Teko:wght@400;700&display=swap');
@@ -117,7 +117,7 @@
 
 <script>
 /**
- * AUDIO & ASSET SYSTEM
+ * ASSET CONFIGURATION
  */
 const charImg = new Image();
 charImg.src = '20251226_201057.png';
@@ -125,7 +125,7 @@ charImg.src = '20251226_201057.png';
 class SoundManager {
     constructor() {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        this.gameOverSound = new Audio('soundeffect.ogg');
+        this.gameOverSound = new Audio('mkb-aag-made-with-Voicemod.ogg');
     }
 
     playFlip() {
@@ -185,7 +185,7 @@ class Particle {
 
 class Hero {
     constructor() {
-        this.size = 80; // Scaled down from 1000 to fit screen but high res source
+        this.size = 90; 
         this.x = 100;
         this.y = floorY - this.size;
         this.isUp = false;
@@ -200,21 +200,16 @@ class Hero {
     update() {
         const oldY = this.y;
         this.y += (this.targetY - this.y) * 0.18;
-        
-        // Rotate based on movement direction
         const dy = this.y - oldY;
-        this.rotation = dy * 0.05; // Tilts as it shifts path
+        this.rotation = dy * 0.04; 
     }
     draw() {
         ctx.save();
         ctx.translate(this.x + this.size/2, this.y + this.size/2);
         ctx.rotate(this.rotation);
-        
-        // Drawing character
         if (charImg.complete) {
             ctx.drawImage(charImg, -this.size/2, -this.size/2, this.size, this.size);
         } else {
-            // Fallback placeholder
             ctx.fillStyle = '#e63946';
             ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
         }
@@ -224,15 +219,15 @@ class Hero {
 
 class FireObstacle {
     constructor() {
-        this.w = 50;
-        this.h = Math.random() * 100 + 80;
+        this.w = 55;
+        this.h = Math.random() * 100 + 85;
         this.x = canvas.width + 100;
         this.onCeiling = Math.random() > 0.5;
         this.y = this.onCeiling ? ceilingY : floorY - this.h;
     }
     update() {
         this.x -= speed;
-        if (Math.random() > 0.5) {
+        if (Math.random() > 0.4) {
             particles.push(new Particle(this.x + Math.random()*this.w, this.y + (this.onCeiling?this.h:0), '#ff4500'));
         }
     }
@@ -258,25 +253,13 @@ function init() {
 
 function loop() {
     if (gameState !== 'PLAYING') return;
-
-    // Background
     ctx.fillStyle = '#1e140f';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Road/Path lines
-    ctx.strokeStyle = '#2d2119';
-    ctx.lineWidth = 2;
-    for(let i=0; i<canvas.width; i+=100) {
-        ctx.beginPath();
-        ctx.moveTo(i - (frames*speed)%100, floorY);
-        ctx.lineTo(i - (frames*speed)%100, ceilingY);
-        ctx.stroke();
-    }
-
     player.update();
     player.draw();
 
-    if (frames % 70 === 0) {
+    if (frames % 75 === 0) {
         obstacles.push(new FireObstacle());
         speed += 0.08;
     }
@@ -286,9 +269,8 @@ function loop() {
         obs.update();
         obs.draw();
 
-        // Collision
-        if (player.x + 10 < obs.x + obs.w && player.x + player.size - 10 > obs.x &&
-            player.y + 10 < obs.y + obs.h && player.y + player.size - 10 > obs.y) {
+        if (player.x + 15 < obs.x + obs.w && player.x + player.size - 15 > obs.x &&
+            player.y + 15 < obs.y + obs.h && player.y + player.size - 15 > obs.y) {
             gameOver();
         }
 
@@ -297,7 +279,6 @@ function loop() {
             score += 100;
             document.getElementById('score-hud').innerText = "SCORE: " + score;
         }
-
         if (obs.x + obs.w < -100) obstacles.splice(i, 1);
     }
 
@@ -334,19 +315,15 @@ function startGame() {
 function gameOver() {
     gameState = 'GAMEOVER';
     sound.playGameOver();
-    
     document.getElementById('main-title').innerText = "GAME OVER";
     document.getElementById('main-title').style.color = "#ff0000";
     document.getElementById('main-title').classList.add('visible');
-    
     const rb = document.getElementById('restart-btn');
     rb.style.display = 'block';
     setTimeout(() => rb.classList.add('visible'), 50);
 }
 
 resize();
-ctx.fillStyle = '#1a0f0a';
-ctx.fillRect(0, 0, canvas.width, canvas.height);
 </script>
 </body>
 </html>
